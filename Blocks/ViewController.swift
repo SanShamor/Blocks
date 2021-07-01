@@ -9,12 +9,16 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var emojiCollection = ["👽", "👻", "🎃", "🤡", "👾", "☠️", "🤮", "🤢", "💩", "🥶"]
-    var emojiDictionary = [Int:String]()
+    private lazy var game = ConcentrationGame(numbersOfCards: numberOfPairsOfCards)
     
-    lazy var game = ConcentrationGame(numbersOfCards: buttonCollection.count)
+    private var emojiCollection = ["👽", "👻", "🎃", "🤡", "👾", "☠️", "🤮", "🤢", "💩", "🥶"]
+    private var emojiDictionary = [Card:String]()
     
-    var touches = 0 {
+    private var numberOfPairsOfCards: Int {
+        return (buttonCollection.count + 1) / 2
+    }
+    
+    private(set) var touches = 0 {
         didSet{
             touchLabel.text = "Touches: \(touches)"
         }
@@ -28,15 +32,14 @@ class ViewController: UIViewController {
         super.viewDidLoad()
     }
     
-    func emojiIdentifier(for card: Card) -> String {
-        if emojiDictionary[card.identifier] == nil {
-            let randomIndex = Int(arc4random_uniform(UInt32(emojiCollection.count)))
-            emojiDictionary[card.identifier] = emojiCollection.remove(at: randomIndex)
+    private func emojiIdentifier(for card: Card) -> String {
+        if emojiDictionary[card] == nil {
+            emojiDictionary[card] = emojiCollection.remove(at: emojiCollection.count.arc4randomExtension)
         }
-        return emojiDictionary[card.identifier] ?? "?"
+        return emojiDictionary[card] ?? "?"
     }
     
-    func updateViewFromModel() {
+    private func updateViewFromModel() {
         for index in buttonCollection.indices {
             let button = buttonCollection[index]
             let card = game.cards[index]
@@ -60,3 +63,15 @@ class ViewController: UIViewController {
     
 }
 
+extension Int {
+    var arc4randomExtension: Int {
+        if self > 0 {
+            return Int(arc4random_uniform(UInt32(self)))
+        } else if self < 0 {
+            return -Int(arc4random_uniform(UInt32(abs(self))))
+        } else {
+            return 0
+        }
+    }
+    
+}

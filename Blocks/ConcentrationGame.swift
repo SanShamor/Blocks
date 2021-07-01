@@ -11,28 +11,43 @@ class ConcentrationGame {
     
     var cards = [Card]()
     
-    var indexOfFaceUpCard: Int?
+    private var indexOfFaceUpCard: Int? {
+        get {
+            var foundIndex: Int?
+            for index in cards.indices {
+                if cards[index].isFacedUp {
+                    if foundIndex == nil {
+                        foundIndex = index
+                    } else {
+                        return nil
+                    }
+                }
+            }
+            return foundIndex
+        }
+        set {
+            for index in cards.indices {
+                cards[index].isFacedUp = (index == newValue)
+            }
+        }
+    }
     
     func chooseCard(at index: Int) {
         if !cards[index].isMatched {
             if let matchingIndex = indexOfFaceUpCard, matchingIndex != index {
-                if cards[matchingIndex].identifier == cards[index].identifier {
+                if cards[matchingIndex] == cards[index] {
                     cards[matchingIndex].isMatched = true
                     cards[index].isMatched = true
                 }
                 cards[index].isFacedUp = true
-                indexOfFaceUpCard = nil
             } else {
-                for flipDown in cards.indices {
-                    cards[flipDown].isFacedUp = false
-                }
-                cards[index].isFacedUp = true
                 indexOfFaceUpCard = index
             }
         }
     }
     
     init(numbersOfCards: Int) {
+        assert(numbersOfCards > 0, "ConcentrationGame.init(\(numbersOfCards): must have at least one pair of cards")
         for _ in 1...numbersOfCards {
             let card = Card()
             cards += [card, card]
